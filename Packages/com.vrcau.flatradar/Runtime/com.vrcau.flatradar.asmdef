@@ -1,0 +1,24 @@
+{
+    "name": "com.vrcau.flatradar",
+    "references": [
+        "VRC.SDK3",
+        "VRC.SDKBase",
+        "UdonSharp.Lib",
+        "UdonRadioCommunication.Runtime",
+        "UdonSharp.Runtime",
+        "VirtualAviationJapan.Virtual-CNS",
+        "InariUdonRuntime",
+        "Unity.TextMeshPro",
+        "UdonSharp.Editor",
+        "UdonToolkitRuntime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

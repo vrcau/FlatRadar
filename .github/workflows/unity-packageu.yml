@@ -1,0 +1,70 @@
+name: Unity Package
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Packages/com.vrcau.flatradar/package.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      packageName: com.vrcau.flatradar
+
+    steps:
+      - name: Checkout
+        uses: apperry/action-cached-lfs-checkout@c0616236fe56259b047ba97925bad9d8b644be88
+
+      - name: Get version
+        id: version
+        uses: zoexx/github-action-json-file-properties@b9f36ce6ee6fe2680cd3c32b2c62e22eade7e590
+        with:
+          file_path: "Packages/${{env.packageName}}/package.json"
+          prop_path: "version"
+
+      - name: Set Environment Variables
+        run: |
+          echo "unityPackage=${{ env.packageName }}-${{ steps.version.outputs.value }}-${{ github.sha }}.unitypackage" >> $GITHUB_ENV
+          echo "zipFile=${{ env.packageName }}-${{ steps.version.outputs.value }}-${{ github.sha }}.zip" >> $GITHUB_ENV
+          find "Packages/${{env.packageName}}/" -name \*.meta >> metaList
+
+      - name: Create Zip
+        uses: TheDoctor0/zip-release@a24011d8d445e4da5935a7e73c1f98e22a439464
+        with:
+          type: "zip"
+          filename: "../../${{ env.zipFile }}"
+          directory: "Packages/${{ env.packageName }}/"
+          exclusions: "*.git* ${{ env.unityPackage }}"
+
+      - name: Create .unitypackage
+        uses: pCYSl5EDgo/create-unitypackage@cfcd3cf0391a5ef1306342794866a9897c32af0b
+        with:
+          package-path: ${{ env.unityPackage }}
+          include-files: metaList
+
+      - name: Upload .unitypackage
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.unityPackage }}
+          path: ${{ env.unityPackage }}
+
+      - name: Upload .zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.zipFile }}
+          path: ${{ env.zipFile }}
+
+      - name: Github Release
+        uses: 6thpath/action-github-release@ba2240e98166a319da08afddd79a2106215bf920
+        with:
+          tag_name: "v${{ steps.version.outputs.value }}"
+          generate_release_notes: true
+          files: |
+            ${{ env.zipFile }}
+            ${{ env.unityPackage }}
+            Packages/${{ env.packageName }}/package.json
