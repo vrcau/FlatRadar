@@ -1,7 +1,5 @@
 ﻿using UdonSharp;
-using UdonSharpEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using VirtualCNS;
 using VRC.SDKBase;
@@ -11,6 +9,8 @@ using VRC.Udon.Common.Enums;
 using System.Linq;
 using UnityEditor;
 using VRC.SDKBase.Editor.BuildPipeline;
+using UnityEngine.SceneManagement;
+using UdonSharpEditor;
 #endif
 
 namespace FlatRadar
@@ -19,6 +19,7 @@ namespace FlatRadar
     public class FlightsPanel : UdonSharpBehaviour
     {
         public GameObject flightIconTemplate;
+        public GameObject navaidIconTemplate;
         public Camera terrainCamera;
         public Text flightsText;
         
@@ -42,13 +43,17 @@ namespace FlatRadar
 
         private void Start()
         {
-            _navaidDatabase = NavaidDatabase.GetInstance();
+            InitNavaids();
+            InitFlightIcons();
 
-            if (!_navaidDatabase)
-            {
-                Debug.LogWarning("NavaidDatabase not found, flat radar won't show navaids");
-            }
+            // Terrain
+            terrainCamera.orthographicSize = 10000f;
+            terrainCamera.enabled = true;
+            SendCustomEventDelayedFrames(nameof(_DisableCamera), 1, EventTiming.LateUpdate);
+        }
 
+        private void InitFlightIcons()
+        {
             _flightIcons = new Transform[traffics.Length];
             _flightTags = new Text[traffics.Length];
             _previousPositions = new Vector3[traffics.Length];
@@ -56,7 +61,6 @@ namespace FlatRadar
 
             for (var index = 0; index < traffics.Length; index++)
             {
-                Debug.Log(callSigns[index]);
                 var flightPrefab = Instantiate(flightIconTemplate, transform, false);
 
                 flightPrefab.name = callSigns[index];
@@ -64,10 +68,27 @@ namespace FlatRadar
                 _flightIcons[index] = flightPrefab.transform;
                 _flightTags[index] = flightPrefab.GetComponentInChildren<Text>();
             }
+        }
+        
+        private void InitNavaids()
+        {
+            _navaidDatabase = NavaidDatabase.GetInstance();
+            if (!_navaidDatabase)
+            {
+                Debug.LogWarning("NavaidDatabase not found, flat radar won't show navaids");
+                return;
+            }
 
-            terrainCamera.orthographicSize = 10000f;
-            terrainCamera.enabled = true;
-            SendCustomEventDelayedFrames(nameof(_DisableCamera), 1, EventTiming.LateUpdate);
+            for (var index = 0; index < _navaidDatabase.transforms.Length; index++)
+            {
+                var navaidTransform = _navaidDatabase.transforms[index];
+                var identify = _navaidDatabase.identities[index];
+
+                var navaid = PlaceIcon(navaidIconTemplate, navaidTransform);
+
+                var navaidText = navaid.GetComponentInChildren<Text>();
+                navaidText.text = identify;
+            }
         }
 
         public void _DisableCamera()
@@ -80,8 +101,6 @@ namespace FlatRadar
             var time = Time.time;
             if (time - _lastUpdate < UpdateInterval) return;
             _lastUpdate = time;
-
-            var scale = mapScale;
 
             var flightsTextTemp = "CALLSIGN |TYPE |REG    |ALT    |GS  |OWNER\n";
 
@@ -104,9 +123,6 @@ namespace FlatRadar
 
                 var owner = Networking.GetOwner(ownerDetector).displayName;
 
-                flightsTextTemp +=
-                    $"{callSign,-9}|V20N |{tailNumber,-7}|{(int)altitude,-7}|{((int)groundSpeed),-4}|{owner}\n";
-
                 // UI Elements
                 var flightIcon = _flightIcons[index];
                 var flightTag = _flightTags[index];
@@ -116,16 +132,37 @@ namespace FlatRadar
                         Vector3.SignedAngle(Vector3.forward, Vector3.Scale(groundVelocity, new Vector3(-1, 1, 1)),
                             Vector3.up), Vector3.forward);
 
-                flightIcon.localPosition = (Vector3.right * position.x + Vector3.up * position.z) * scale;
+                flightIcon.localPosition = ToMapPosition(traffic);
                 flightIcon.localRotation = rotation;
 
                 flightTag.transform.localRotation = Quaternion.Inverse(rotation);
                 flightTag.text = $"{callSign} {tailNumber}\n" +
                                  $"{(int)altitude}ft {(int)groundSpeed}kt\n" +
                                  $"{owner}";
+                
+                // Update Flights Text
+                flightsTextTemp +=
+                    $"{callSign,-9}|V20N |{tailNumber,-7}|{(int)altitude,-7}|{((int)groundSpeed),-4}|{owner}\n";
             }
 
             flightsText.text = flightsTextTemp;
+        }
+
+        private GameObject PlaceIcon(GameObject go, Transform sourceTransform)
+        {
+            var icon = Instantiate(go, transform, false);
+            icon.transform.localPosition = ToMapPosition(sourceTransform);
+
+            return icon;
+        }
+
+        private Vector3 ToMapPosition(Transform sourceTransform)
+        {
+            var radarTransform = transform;
+            var navaidPosition = sourceTransform.position - radarTransform.position;
+            var navaidPositionScale = (Vector3.right * navaidPosition.x + Vector3.up * navaidPosition.z) * mapScale;
+
+            return navaidPositionScale;
         }
 
 #if !COMPILER_UDONSHARP && UNITY_EDITOR

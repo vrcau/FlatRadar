@@ -1,15 +1,12 @@
-﻿using System;
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
-using VRC.SDKBase;
-using VRC.Udon;
 
 namespace FlatRadar
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class TouchMap : UdonSharpBehaviour
     {
-        private void LateUpdate()
+        public override void PostLateUpdate()
         {
             var gm = gameObject;
 

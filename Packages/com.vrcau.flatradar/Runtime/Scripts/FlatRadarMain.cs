@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UdonSharp;
 using UnityEditor;
 using UnityEngine;
@@ -8,6 +7,7 @@ using URC;
 
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using UdonSharpEditor;
+using System.Linq;
 #endif
 
 namespace FlatRadar
