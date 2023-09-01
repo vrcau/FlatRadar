@@ -23,6 +23,7 @@ namespace FlatRadar
         public GameObject navaidIconTemplate;
         public Camera terrainCamera;
         public Text flightsText;
+        public Transform seaLevel;
 
         public float mapScale = 0.025f;
 
@@ -145,7 +146,7 @@ namespace FlatRadar
                 var ownerDetector = ownerDetectors[index];
 
                 var position = traffic.position - transform.position;
-                var altitude = position.y * 3.28084f;
+                var altitude = position.y - seaLevel.position.y * 3.28084f;
 
                 var groundVelocity = Vector3.ProjectOnPlane(position - _previousPositions[index], Vector3.up);
                 var groundSpeed = groundVelocity.magnitude / (time - _previousTimes[index]) * 1.94384f;
