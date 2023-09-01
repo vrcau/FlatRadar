@@ -1,4 +1,5 @@
-﻿using UdonSharp;
+﻿using TMPro;
+using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
 using VirtualCNS;
@@ -22,8 +23,30 @@ namespace FlatRadar
         public GameObject navaidIconTemplate;
         public Camera terrainCamera;
         public Text flightsText;
-        
+
         public float mapScale = 0.025f;
+
+        [FieldChangeCallback(nameof(UITextScale))]
+        private float _uiTextScale = 1f;
+
+        public float UITextScale
+        {
+            get => _uiTextScale;
+            set
+            {
+                _uiTextScale = value;
+
+                foreach (var navaid in _navaids)
+                {
+                    navaid.transform.localScale = new Vector3(_uiTextScale, _uiTextScale, 1);
+                }
+
+                foreach (var icon in _flightIcons)
+                {
+                    icon.transform.localScale = new Vector3(_uiTextScale, _uiTextScale, 1);
+                }
+            }
+        }
 
         [HideInInspector] public Transform[] traffics = { };
         [HideInInspector] public string[] tailNumbers = { };
@@ -31,7 +54,10 @@ namespace FlatRadar
         [HideInInspector] public GameObject[] ownerDetectors = { };
 
         private Transform[] _flightIcons = { };
-        private Text[] _flightTags = { };
+        private TextMeshProUGUI[] _flightTags = { };
+
+        private Transform[] _navaids = { };
+        private Text[] _navaidTexts = { };
 
         private Vector3[] _previousPositions = { };
         private float[] _previousTimes = { };
@@ -55,7 +81,7 @@ namespace FlatRadar
         private void InitFlightIcons()
         {
             _flightIcons = new Transform[traffics.Length];
-            _flightTags = new Text[traffics.Length];
+            _flightTags = new TextMeshProUGUI[traffics.Length];
             _previousPositions = new Vector3[traffics.Length];
             _previousTimes = new float[traffics.Length];
 
@@ -66,10 +92,10 @@ namespace FlatRadar
                 flightPrefab.name = callSigns[index];
 
                 _flightIcons[index] = flightPrefab.transform;
-                _flightTags[index] = flightPrefab.GetComponentInChildren<Text>();
+                _flightTags[index] = flightPrefab.GetComponentInChildren<TextMeshProUGUI>();
             }
         }
-        
+
         private void InitNavaids()
         {
             _navaidDatabase = NavaidDatabase.GetInstance();
@@ -78,6 +104,9 @@ namespace FlatRadar
                 Debug.LogWarning("NavaidDatabase not found, flat radar won't show navaids");
                 return;
             }
+
+            _navaids = new Transform[_navaidDatabase.transforms.Length];
+            _navaidTexts = new Text[_navaidDatabase.transforms.Length];
 
             for (var index = 0; index < _navaidDatabase.transforms.Length; index++)
             {
@@ -88,6 +117,9 @@ namespace FlatRadar
 
                 var navaidText = navaid.GetComponentInChildren<Text>();
                 navaidText.text = identify;
+
+                _navaids[index] = navaid.transform;
+                _navaidTexts[index] = navaidText;
             }
         }
 
@@ -136,10 +168,11 @@ namespace FlatRadar
                 flightIcon.localRotation = rotation;
 
                 flightTag.transform.localRotation = Quaternion.Inverse(rotation);
+
                 flightTag.text = $"{callSign} {tailNumber}\n" +
                                  $"{(int)altitude}ft {(int)groundSpeed}kt\n" +
                                  $"{owner}";
-                
+
                 // Update Flights Text
                 flightsTextTemp +=
                     $"{callSign,-9}|V20N |{tailNumber,-7}|{(int)altitude,-7}|{((int)groundSpeed),-4}|{owner}\n";

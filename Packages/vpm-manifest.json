@@ -24,13 +24,13 @@
       }
     },
     "com.vrchat.worlds": {
-      "version": "3.2.3",
+      "version": "3.3.0-beta.1",
       "dependencies": {
-        "com.vrchat.base": "3.2.3"
+        "com.vrchat.base": "3.3.0-beta.1"
       }
     },
     "com.vrchat.base": {
-      "version": "3.2.3",
+      "version": "3.3.0-beta.1",
       "dependencies": {}
     },
     "com.vrchat.clientsim": {
