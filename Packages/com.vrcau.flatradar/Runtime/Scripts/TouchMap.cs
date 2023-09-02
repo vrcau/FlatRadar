@@ -1,8 +1,5 @@
-﻿using System;
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using VRC.Udon.Common.Enums;
 
 namespace FlatRadar
 {
