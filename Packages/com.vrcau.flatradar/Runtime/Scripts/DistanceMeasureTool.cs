@@ -29,6 +29,12 @@ namespace FlatRadar
         public void _StartMeasure()
         {
             _Reset();
+            if (_toolStatus != ToolStatus.Disable)
+            {
+                _toolStatus = ToolStatus.Disable;
+                return;
+            }
+
             _toolStatus = ToolStatus.StartPoint;
 
             measureStartMark.SetActive(true);
@@ -36,13 +42,18 @@ namespace FlatRadar
 
         public void _Reset()
         {
-            _toolStatus = ToolStatus.Disable;
             lineRenderer.enabled = false;
             lineRenderer.SetPosition(0, Vector3.zero);
             lineRenderer.SetPosition(1, Vector3.zero);
 
             measureStartMark.SetActive(false);
             measureEndMark.SetActive(false);
+        }
+
+        public void _FullyReset()
+        {
+            _toolStatus = ToolStatus.Disable;
+            _Reset();
         }
 
         public override void PostLateUpdate()
@@ -66,7 +77,7 @@ namespace FlatRadar
                 case ToolStatus.EndPoint:
                     if (Input.GetMouseButtonDown(0))
                     {
-                        _toolStatus = ToolStatus.Disable;
+                        _toolStatus = ToolStatus.Done;
                         return;
                     }
 
@@ -101,6 +112,7 @@ namespace FlatRadar
     public enum ToolStatus
     {
         Disable,
+        Done,
         StartPoint,
         EndPoint
     }

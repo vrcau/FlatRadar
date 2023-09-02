@@ -6,37 +6,39 @@ namespace FlatRadar
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class TouchMap : UdonSharpBehaviour
     {
-        // private BoxCollider _collider;
-        // private Rigidbody _rigidbody;
-        // public GameObject screen;
-
         public FlightsPanel flightPanel;
+        public DistanceMeasureTool distanceMeasureTool;
         public float mapScaleRate = 1.1f;
 
         private int _scaleLevel = 1;
 
         public void _MoveMapUp()
         {
+            distanceMeasureTool._FullyReset();
             transform.localPosition += Vector3.down * 30 * (mapScaleRate / Mathf.Abs(_scaleLevel));
         }
 
         public void _MoveMapDown()
         {
+            distanceMeasureTool._FullyReset();
             transform.localPosition += Vector3.up * 30 * (mapScaleRate / Mathf.Abs(_scaleLevel));
         }
 
         public void _MoveMapLeft()
         {
+            distanceMeasureTool._FullyReset();
             transform.localPosition += Vector3.right * 30 * (mapScaleRate / Mathf.Abs(_scaleLevel));
         }
 
         public void _MoveMapRight()
         {
+            distanceMeasureTool._FullyReset();
             transform.localPosition += Vector3.left * 30 * (mapScaleRate / Mathf.Abs(_scaleLevel));
         }
 
         public void _Reset()
         {
+            distanceMeasureTool._FullyReset();
             var gameObjectTransform = transform;
 
             gameObjectTransform.localPosition = Vector3.zero;
@@ -47,6 +49,7 @@ namespace FlatRadar
 
         public void _ReduceMapScale()
         {
+            distanceMeasureTool._FullyReset();
             flightPanel.UITextScale *= mapScaleRate;
 
             var gameObjectTransform = transform;
@@ -60,6 +63,7 @@ namespace FlatRadar
 
         public void _AddMapScale()
         {
+            distanceMeasureTool._FullyReset();
             flightPanel.UITextScale /= mapScaleRate;
 
             var gameObjectTransform = transform;
@@ -70,28 +74,5 @@ namespace FlatRadar
 
             _scaleLevel++;
         }
-
-        // private void Start()
-        // {
-        //     _collider = GetComponent<BoxCollider>();
-        //     _rigidbody = GetComponent<Rigidbody>();
-        // }
-        //
-        // private void LateUpdate()
-        // {
-        //     _rigidbody.velocity = Vector3.zero;
-        //
-        //     var gm = gameObject;
-        //
-        //     var localPosition = gm.transform.localPosition;
-        //     localPosition.z = 0;
-        //
-        //     gm.transform.localPosition = localPosition;
-        //     gm.transform.localRotation = Quaternion.identity;
-        //
-        //     var toScreenCenter = screen.transform.localPosition - transform.localPosition;
-        //     toScreenCenter.z = 0;
-        //     _collider.center = toScreenCenter;
-        // }
     }
 }
