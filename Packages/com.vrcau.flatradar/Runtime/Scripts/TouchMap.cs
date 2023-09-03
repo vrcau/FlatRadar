@@ -44,12 +44,14 @@ namespace FlatRadar
             gameObjectTransform.localPosition = Vector3.zero;
             gameObjectTransform.localScale = Vector3.one;
             flightPanel.UITextScale = 1f;
+            distanceMeasureTool.UITextScale = 1f;
             _scaleLevel = 1;
         }
 
         public void _ReduceMapScale()
         {
             distanceMeasureTool._FullyReset();
+            distanceMeasureTool.UITextScale *= mapScaleRate;
             flightPanel.UITextScale *= mapScaleRate;
 
             var gameObjectTransform = transform;
@@ -64,6 +66,7 @@ namespace FlatRadar
         public void _AddMapScale()
         {
             distanceMeasureTool._FullyReset();
+            distanceMeasureTool.UITextScale /= mapScaleRate;
             flightPanel.UITextScale /= mapScaleRate;
 
             var gameObjectTransform = transform;

@@ -21,6 +21,23 @@ namespace FlatRadar
         public float scaleX = 2f;
         public float scaleY = 2f;
 
+        public float mapScale = 0.025f;
+
+        [FieldChangeCallback(nameof(UITextScale))]
+        private float _uiTextScale = 1f;
+        public float UITextScale
+        {
+            get => _uiTextScale;
+            set
+            {
+                _uiTextScale = value;
+
+                var scale = new Vector3(_uiTextScale, _uiTextScale, 1f);
+                measureEndMark.transform.localScale = scale;
+                measureStartMark.transform.localScale = scale;
+            }
+        }
+
         private ToolStatus _toolStatus = ToolStatus.Disable;
 
         private void Start()
@@ -75,7 +92,7 @@ namespace FlatRadar
 
                     var startPosition = measureStartMark.transform.position;
 
-                    startPosition = GetMarkPosition(startPosition.z - 0.0001f);
+                    startPosition = GetMarkPosition(startPosition.z);
                     measureStartMark.transform.position = startPosition;
                     break;
                 case ToolStatus.EndPoint:
@@ -83,17 +100,18 @@ namespace FlatRadar
                     {
                         _toolStatus = ToolStatus.Done;
                         distanceResultText.gameObject.SetActive(true);
-                        distanceResultText.text = Vector3.Distance(measureStartMark.transform.localPosition,
-                            measureEndMark.transform.localPosition).ToString("F");
+                        distanceResultText.text = (Vector3.Distance(measureStartMark.transform.localPosition,
+                            measureEndMark.transform.localPosition) / mapScale).ToString("F") + "m";
                         return;
                     }
 
                     measureEndMark.SetActive(true);
                     var endPosition = measureEndMark.transform.position;
 
-                    endPosition = GetMarkPosition(endPosition.z - 0.0001f);
+                    endPosition = GetMarkPosition(endPosition.z);
                     measureEndMark.transform.position = endPosition;
-                    lineRenderer.SetPosition(1, endPosition);
+
+                    lineRenderer.SetPosition(1, new Vector3(endPosition.x, endPosition.y, endPosition.z - 0.0001f));
                     break;
             }
         }
