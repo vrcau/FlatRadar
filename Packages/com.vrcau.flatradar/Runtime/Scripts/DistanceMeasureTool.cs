@@ -1,15 +1,18 @@
 ﻿using UdonSharp;
 using UnityEngine;
+using UnityEngine.UI;
 using VRC.SDKBase;
 
 namespace FlatRadar
 {
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class DistanceMeasureTool : UdonSharpBehaviour
     {
         private VRCPlayerApi _localPlayer;
 
         public GameObject measureStartMark;
         public GameObject measureEndMark;
+        public Text distanceResultText;
 
         public LineRenderer lineRenderer;
 
@@ -46,6 +49,7 @@ namespace FlatRadar
             lineRenderer.SetPosition(0, Vector3.zero);
             lineRenderer.SetPosition(1, Vector3.zero);
 
+            distanceResultText.gameObject.SetActive(false);
             measureStartMark.SetActive(false);
             measureEndMark.SetActive(false);
         }
@@ -78,6 +82,9 @@ namespace FlatRadar
                     if (Input.GetMouseButtonDown(0))
                     {
                         _toolStatus = ToolStatus.Done;
+                        distanceResultText.gameObject.SetActive(true);
+                        distanceResultText.text = Vector3.Distance(measureStartMark.transform.localPosition,
+                            measureEndMark.transform.localPosition).ToString("F");
                         return;
                     }
 
@@ -102,10 +109,20 @@ namespace FlatRadar
             var headTrackingData = _localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head);
             var distanceToScreen = Mathf.Abs(headTrackingData.position.z - screen.position.z);
 
-            return new Vector3(
-                headTrackingData.position.x - Mathf.Tan(headTrackingData.rotation.y) * distanceToScreen * scaleX,
-                headTrackingData.position.y + Mathf.Tan(headTrackingData.rotation.x) * distanceToScreen * scaleY
-                , originalZ);
+            if (headTrackingData.rotation.w >= 0f)
+            {
+                return new Vector3(
+                    headTrackingData.position.x + Mathf.Tan(headTrackingData.rotation.y) * distanceToScreen * scaleX,
+                    headTrackingData.position.y - Mathf.Tan(headTrackingData.rotation.x) * distanceToScreen * scaleY
+                    , originalZ);
+            }
+            else
+            {
+                return new Vector3(
+                    headTrackingData.position.x - Mathf.Tan(headTrackingData.rotation.y) * distanceToScreen * scaleX,
+                    headTrackingData.position.y + Mathf.Tan(headTrackingData.rotation.x) * distanceToScreen * scaleY
+                    , originalZ);
+            }
         }
     }
 

@@ -2937,6 +2937,84 @@ MonoBehaviour:
           m_StringArgument: _MoveMapUp
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &6113768160980689874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3187052844646820524}
+  - component: {fileID: 4243374542244826196}
+  - component: {fileID: 1607452808975945407}
+  m_Layer: 13
+  m_Name: DistanceResult
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &3187052844646820524
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6113768160980689874}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3194543072839555032}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 190, y: 0}
+  m_SizeDelta: {x: 300, y: 40}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &4243374542244826196
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6113768160980689874}
+  m_CullTransparentMesh: 0
+--- !u!114 &1607452808975945407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6113768160980689874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: d159d18199830a641bde3a6d945a8348, type: 3}
+    m_FontSize: 28
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 40
+    m_Alignment: 3
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 512m
 --- !u!1 &6120577681389028395
 GameObject:
   m_ObjectHideFlags: 0
@@ -3115,6 +3193,7 @@ RectTransform:
   m_LocalScale: {x: 0.02, y: 0.02, z: 1}
   m_Children:
   - {fileID: 9135710368514763621}
+  - {fileID: 3187052844646820524}
   m_Father: {fileID: 1362316106469403039}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3517,6 +3596,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 318022873431334647}
   measureStartMark: {fileID: 395880261594880075}
   measureEndMark: {fileID: 6450613078592515154}
+  distanceResultText: {fileID: 1607452808975945407}
   lineRenderer: {fileID: 6663744982791779542}
   screen: {fileID: 1362316106469403039}
   scaleX: 2
@@ -3597,7 +3677,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.5
+        value: 0.125
         inSlope: 0
         outSlope: 0
         tangentMode: 0
