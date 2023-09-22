@@ -1,5 +1,7 @@
-﻿using UdonSharp;
+﻿using System;
+using UdonSharp;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FlatRadar
 {
@@ -8,74 +10,38 @@ namespace FlatRadar
     {
         public FlightsPanel flightPanel;
         public DistanceMeasureTool distanceMeasureTool;
+
+        public Slider scaleLevelSlider;
+
         public float mapScaleRate = 1.1f;
 
-        private int _scaleLevel = 1;
+        private RectTransform _rectTransform;
 
-        public void _MoveMapUp()
+        private void Start()
         {
-            distanceMeasureTool._FullyReset();
-            transform.localPosition += Vector3.down * 30 * (mapScaleRate / Mathf.Abs(_scaleLevel));
+            _rectTransform = GetComponent<RectTransform>();
+
+            _Reset();
+            _UpdateScaleLevel();
         }
 
-        public void _MoveMapDown()
+        public void _UpdateScaleLevel()
         {
-            distanceMeasureTool._FullyReset();
-            transform.localPosition += Vector3.up * 30 * (mapScaleRate / Mathf.Abs(_scaleLevel));
-        }
+            transform.localScale = Vector3.one * scaleLevelSlider.value;
 
-        public void _MoveMapLeft()
-        {
-            distanceMeasureTool._FullyReset();
-            transform.localPosition += Vector3.right * 30 * (mapScaleRate / Mathf.Abs(_scaleLevel));
-        }
-
-        public void _MoveMapRight()
-        {
-            distanceMeasureTool._FullyReset();
-            transform.localPosition += Vector3.left * 30 * (mapScaleRate / Mathf.Abs(_scaleLevel));
+            flightPanel.UITextScale = 1f / scaleLevelSlider.value;
+            distanceMeasureTool.UITextScale = 1f / scaleLevelSlider.value;
         }
 
         public void _Reset()
         {
             distanceMeasureTool._FullyReset();
-            var gameObjectTransform = transform;
 
-            gameObjectTransform.localPosition = Vector3.zero;
-            gameObjectTransform.localScale = Vector3.one;
+            _rectTransform.anchoredPosition = Vector2.zero;
+
+            transform.localScale = Vector3.one;
             flightPanel.UITextScale = 1f;
             distanceMeasureTool.UITextScale = 1f;
-            _scaleLevel = 1;
-        }
-
-        public void _ReduceMapScale()
-        {
-            distanceMeasureTool._FullyReset();
-            distanceMeasureTool.UITextScale *= mapScaleRate;
-            flightPanel.UITextScale *= mapScaleRate;
-
-            var gameObjectTransform = transform;
-            var localScale = gameObjectTransform.localScale;
-
-            localScale = new Vector3(localScale.x / mapScaleRate, localScale.y / mapScaleRate, 1);
-            gameObjectTransform.localScale = localScale;
-
-            _scaleLevel--;
-        }
-
-        public void _AddMapScale()
-        {
-            distanceMeasureTool._FullyReset();
-            distanceMeasureTool.UITextScale /= mapScaleRate;
-            flightPanel.UITextScale /= mapScaleRate;
-
-            var gameObjectTransform = transform;
-            var localScale = gameObjectTransform.localScale;
-
-            localScale = new Vector3(localScale.x * mapScaleRate, localScale.y * mapScaleRate, 1);
-            gameObjectTransform.localScale = localScale;
-
-            _scaleLevel++;
         }
     }
 }
