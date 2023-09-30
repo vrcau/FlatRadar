@@ -6,24 +6,17 @@ using VirtualCNS;
 using VRC.SDKBase;
 using VRC.Udon.Common.Enums;
 
-#if !COMPILER_UDONSHARP && UNITY_EDITOR
-using System.Linq;
-using UnityEditor;
-using VRC.SDKBase.Editor.BuildPipeline;
-using UnityEngine.SceneManagement;
-using UdonSharpEditor;
-#endif
-
 namespace FlatRadar
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class FlightsPanel : UdonSharpBehaviour
     {
+        private FlatRadarTerminal _flatRadarTerminal;
+
         public GameObject flightIconTemplate;
         public GameObject navaidIconTemplate;
         public Camera terrainCamera;
         public Text flightsText;
-        public Transform seaLevel;
 
         public float mapScale = 0.025f;
 
@@ -49,10 +42,12 @@ namespace FlatRadar
             }
         }
 
-        [HideInInspector] public Transform[] traffics = { };
-        [HideInInspector] public string[] tailNumbers = { };
-        [HideInInspector] public string[] callSigns = { };
-        [HideInInspector] public GameObject[] ownerDetectors = { };
+        private Transform[] _traffics = { };
+        private string[] _tailNumbers = { };
+        private string[] _callSigns = { };
+        private GameObject[] _ownerDetectors = { };
+
+        private Transform _seaLevel;
 
         private Transform[] _flightIcons = { };
         private TextMeshProUGUI[] _flightTags = { };
@@ -70,6 +65,21 @@ namespace FlatRadar
 
         private void Start()
         {
+            _flatRadarTerminal = GetComponentInParent<FlatRadarTerminal>();
+
+            if (!_flatRadarTerminal)
+            {
+                enabled = false;
+                return;
+            }
+
+            _traffics = _flatRadarTerminal.flatRadarServer.traffics;
+            _tailNumbers = _flatRadarTerminal.flatRadarServer.tailNumbers;
+            _callSigns = _flatRadarTerminal.flatRadarServer.callSigns;
+            _ownerDetectors = _flatRadarTerminal.flatRadarServer.ownerDetectors;
+
+            _seaLevel = _flatRadarTerminal.flatRadarServer.seaLevel;
+
             InitNavaids();
             InitFlightIcons();
 
@@ -81,16 +91,16 @@ namespace FlatRadar
 
         private void InitFlightIcons()
         {
-            _flightIcons = new Transform[traffics.Length];
-            _flightTags = new TextMeshProUGUI[traffics.Length];
-            _previousPositions = new Vector3[traffics.Length];
-            _previousTimes = new float[traffics.Length];
+            _flightIcons = new Transform[_traffics.Length];
+            _flightTags = new TextMeshProUGUI[_traffics.Length];
+            _previousPositions = new Vector3[_traffics.Length];
+            _previousTimes = new float[_traffics.Length];
 
-            for (var index = 0; index < traffics.Length; index++)
+            for (var index = 0; index < _traffics.Length; index++)
             {
                 var flightPrefab = Instantiate(flightIconTemplate, transform, false);
 
-                flightPrefab.name = callSigns[index];
+                flightPrefab.name = _callSigns[index];
 
                 _flightIcons[index] = flightPrefab.transform;
                 _flightTags[index] = flightPrefab.GetComponentInChildren<TextMeshProUGUI>();
@@ -137,16 +147,16 @@ namespace FlatRadar
 
             var flightsTextTemp = "CALLSIGN |TYPE |REG    |ALT    |GS  |OWNER\n";
 
-            for (var index = 0; index < traffics.Length; index++)
+            for (var index = 0; index < _traffics.Length; index++)
             {
                 // Traffic Data
-                var traffic = traffics[index];
-                var tailNumber = tailNumbers[index];
-                var callSign = callSigns[index];
-                var ownerDetector = ownerDetectors[index];
+                var traffic = _traffics[index];
+                var tailNumber = _tailNumbers[index];
+                var callSign = _callSigns[index];
+                var ownerDetector = _ownerDetectors[index];
 
                 var position = traffic.position - transform.position;
-                var altitude = position.y - seaLevel.position.y * 3.28084f;
+                var altitude = position.y - _seaLevel.position.y * 3.28084f;
 
                 var groundVelocity = Vector3.ProjectOnPlane(position - _previousPositions[index], Vector3.up);
                 var groundSpeed = groundVelocity.magnitude / (time - _previousTimes[index]) * 1.94384f;
@@ -179,7 +189,8 @@ namespace FlatRadar
                     $"{callSign,-9}|V20N |{tailNumber,-7}|{(int)altitude,-7}|{((int)groundSpeed),-4}|{owner}\n";
             }
 
-            flightsText.text = flightsTextTemp;
+            if (flightsText)
+                flightsText.text = flightsTextTemp;
         }
 
         private GameObject PlaceIcon(GameObject go, Transform sourceTransform)
@@ -198,59 +209,5 @@ namespace FlatRadar
 
             return navaidPositionScale;
         }
-
-#if !COMPILER_UDONSHARP && UNITY_EDITOR
-        public void Setup()
-        {
-            var rootObjects = gameObject.scene.GetRootGameObjects();
-            var trafficSources = rootObjects.SelectMany(o => o.GetComponentsInChildren<TailNumberManager>()).ToArray();
-
-            traffics = trafficSources.Select(s => s.transform).ToArray();
-            tailNumbers = trafficSources.Select(s => s.tailNumber).ToArray();
-            callSigns = trafficSources.Select(s => s.callsign).ToArray();
-            ownerDetectors = trafficSources.Select(s => s.gameObject).ToArray();
-        }
-#endif
     }
-
-#if !COMPILER_UDONSHARP && UNITY_EDITOR
-    [CustomEditor(typeof(FlightsPanel))]
-    public class FlightPanelEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            if (UdonSharpGUI.DrawDefaultUdonSharpBehaviourHeader(target)) return;
-
-            base.OnInspectorGUI();
-
-            var panel = target as FlightsPanel;
-            if (panel == null) return;
-
-            if (GUILayout.Button("Setup"))
-            {
-                panel.Setup();
-                ;
-                EditorUtility.SetDirty(target);
-            }
-        }
-    }
-
-    public class FlightPanelBuildCallback : IVRCSDKBuildRequestedCallback
-    {
-        public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
-        {
-            var rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
-            var flightsPanels = rootObjects.SelectMany(o => o.GetComponentsInChildren<FlightsPanel>()).ToArray();
-
-            foreach (var flightsPanel in flightsPanels)
-            {
-                flightsPanel.Setup();
-            }
-
-            return true;
-        }
-
-        public int callbackOrder => 0;
-    }
-#endif
 }
