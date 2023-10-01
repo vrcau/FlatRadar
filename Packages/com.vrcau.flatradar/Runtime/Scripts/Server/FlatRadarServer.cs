@@ -23,6 +23,7 @@ namespace FlatRadar.Server
         [HideInInspector] public string[] atcFreq;
 
         public Transform seaLevel;
+        public Transform renderOrigin;
 
         private FlatRadarTerminal[] _terminals = {};
 

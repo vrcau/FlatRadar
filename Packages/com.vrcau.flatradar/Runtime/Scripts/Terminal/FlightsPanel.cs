@@ -84,6 +84,12 @@ namespace FlatRadar
             InitFlightIcons();
 
             // Terrain
+            var cameraGameObject = terrainCamera.gameObject;
+            var renderOriginTransform = _flatRadarTerminal.flatRadarServer.renderOrigin.transform;
+
+            cameraGameObject.transform.position = renderOriginTransform.position;
+            cameraGameObject.transform.rotation = new Quaternion(0.7f, 0f, 0f, 0.7f);
+
             terrainCamera.orthographicSize = 10000f;
             terrainCamera.enabled = true;
             SendCustomEventDelayedFrames(nameof(_DisableCamera), 1, EventTiming.LateUpdate);
