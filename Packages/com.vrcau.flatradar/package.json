@@ -1,12 +1,10 @@
 {
   "name": "com.vrcau.flatradar",
   "displayName": "FlatRadar",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A simple radar for SaccFlightAndVehicles and Virtual-CNS",
   "gitDependencies": {},
-  "vpmDependencies": {
-    "com.vrchat.udonsharp": "1.1.9"
-  },
+  "vpmDependencies": {},
   "author": {
     "name": "VRChat Aerospace University",
     "email": "lipww1234@foxmail.com"
