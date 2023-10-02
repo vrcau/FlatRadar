@@ -1,7 +1,7 @@
 {
   "name": "com.vrcau.flatradar",
   "displayName": "FlatRadar",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "A simple radar for SaccFlightAndVehicles and Virtual-CNS",
   "gitDependencies": {},
   "vpmDependencies": {},
