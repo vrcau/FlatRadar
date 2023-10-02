@@ -25,6 +25,9 @@ namespace FlatRadar.Server
         public Transform seaLevel;
         public Transform renderOrigin;
 
+        [HideInInspector] public Transform[] cameraPositions = {};
+        [HideInInspector] public string[] cameraNames = { };
+
         private FlatRadarTerminal[] _terminals = {};
 
         [PublicAPI]
@@ -105,6 +108,69 @@ namespace FlatRadar.Server
             if (GUILayout.Button("Setup"))
             {
                 server.Setup();
+                EditorUtility.SetDirty(target);
+            }
+
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("Cameras", new GUIStyle
+            {
+                fontSize = 12,
+                fontStyle = FontStyle.Bold,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            });
+
+            for (var index = 0; index < server.cameraNames.Length; index++)
+            {
+                var cameraName = server.cameraNames[index];
+                var cameraPosition = server.cameraPositions[index];
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    using (var change = new EditorGUI.ChangeCheckScope())
+                    {
+                        var newCameraName = EditorGUILayout.TextField(cameraName);
+                        var newCameraPosition = EditorGUILayout.ObjectField(cameraPosition, typeof(Transform), true) as Transform;
+                        if (GUILayout.Button("Remove"))
+                        {
+                            var newCameraNames = server.cameraNames.ToList();
+                            var newCameraPositions = server.cameraPositions.ToList();
+
+                            newCameraNames.Remove(cameraName);
+                            newCameraPositions.Remove(cameraPosition);
+
+                            server.cameraNames = newCameraNames.ToArray();
+                            server.cameraPositions = newCameraPositions.ToArray();
+
+                            EditorUtility.SetDirty(target);
+                            return;
+                        }
+
+                        if (!change.changed) continue;
+
+                        server.cameraNames[index] = newCameraName;
+                        server.cameraPositions[index] = newCameraPosition;
+
+                        EditorUtility.SetDirty(target);
+                    }
+                }
+            }
+
+            if (GUILayout.Button("Add"))
+            {
+                var newCameraName = new string[server.cameraNames.Length + 1];
+                var newCameraPosition = new Transform[server.cameraPositions.Length + 1];
+
+                server.cameraNames.CopyTo(newCameraName, 0);
+                server.cameraPositions.CopyTo(newCameraPosition, 0);
+
+                newCameraName[newCameraName.Length - 1] = "CAM NAME";
+                newCameraPosition[newCameraPosition.Length - 1] = null;
+
+                server.cameraNames = newCameraName;
+                server.cameraPositions = newCameraPosition;
+
                 EditorUtility.SetDirty(target);
             }
 
