@@ -44,7 +44,7 @@ namespace FlatRadar
                 var transmit = transceiver._GetTransmit();
                 var receive = transceiver.receiver.Active;
                 statusText.text =
-                    $"{transceiver.Frequency:F} {(transmit ? "<color=#43cf7c>RX</color>" : "RX")} {(receive ? "<color=#43cf7c>TX</color>" : "TX")} | ";
+                    $"{transceiver.Frequency:F} {(receive ? "<color=#43cf7c>RX</color>" : "RX")} {(transmit ? "<color=#43cf7c>TX</color>" : "TX")} | ";
             }
             else
             {
