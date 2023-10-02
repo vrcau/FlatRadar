@@ -209,7 +209,7 @@ namespace FlatRadar
 
         private Vector3 ToMapPosition(Transform sourceTransform)
         {
-            var radarTransform = transform;
+            var radarTransform = _flatRadarTerminal.flatRadarServer.renderOrigin;
             var navaidPosition = sourceTransform.position - radarTransform.position;
             var navaidPositionScale = (Vector3.right * navaidPosition.x + Vector3.up * navaidPosition.z) * mapScale;
 

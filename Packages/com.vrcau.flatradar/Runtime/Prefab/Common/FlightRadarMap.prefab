@@ -778,7 +778,7 @@ MonoBehaviour:
   flightPanel: {fileID: 74884819865205826}
   distanceMeasureTool: {fileID: 4662870088378358200}
   scaleLevelSlider: {fileID: 8527835493569165548}
-  mapScaleRate: 1.1
+  initialScale: 1
 --- !u!114 &5733205986574090570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1076,7 +1076,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 5733205986574090570}
         m_MethodName: SendCustomEvent
         m_Mode: 5
         m_Arguments:
@@ -1271,7 +1271,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 42.879944, y: -12.320007}
+  m_AnchoredPosition: {x: -42.87994, y: -9}
   m_SizeDelta: {x: 8, y: 13}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &42673591713443038

@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +14,7 @@ namespace FlatRadar
 
         public Slider scaleLevelSlider;
 
-        public float mapScaleRate = 1.1f;
+        public float initialScale = 1f;
 
         private RectTransform _rectTransform;
 
@@ -25,6 +26,7 @@ namespace FlatRadar
             _UpdateScaleLevel();
         }
 
+        [PublicAPI]
         public void _UpdateScaleLevel()
         {
             transform.localScale = Vector3.one * scaleLevelSlider.value;
@@ -33,15 +35,18 @@ namespace FlatRadar
             distanceMeasureTool.UITextScale = 1f / scaleLevelSlider.value;
         }
 
+        [PublicAPI]
         public void _Reset()
         {
             distanceMeasureTool._FullyReset();
 
             _rectTransform.anchoredPosition = Vector2.zero;
 
-            transform.localScale = Vector3.one;
-            flightPanel.UITextScale = 1f;
-            distanceMeasureTool.UITextScale = 1f;
+            scaleLevelSlider.value = initialScale;
+
+            transform.localScale = Vector3.one * scaleLevelSlider.value;
+            flightPanel.UITextScale = 1f / scaleLevelSlider.value;
+            distanceMeasureTool.UITextScale = 1f / scaleLevelSlider.value;
         }
     }
 }
