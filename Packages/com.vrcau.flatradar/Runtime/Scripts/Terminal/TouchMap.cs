@@ -27,6 +27,34 @@ namespace FlatRadar
         }
 
         [PublicAPI]
+        public void _MoveMapUp()
+        {
+            distanceMeasureTool._FullyReset();
+            transform.localPosition += Vector3.down * 15 * scaleLevelSlider.value;
+        }
+
+        [PublicAPI]
+        public void _MoveMapDown()
+        {
+            distanceMeasureTool._FullyReset();
+            transform.localPosition += Vector3.up * 15 * scaleLevelSlider.value;
+        }
+
+        [PublicAPI]
+        public void _MoveMapLeft()
+        {
+            distanceMeasureTool._FullyReset();
+            transform.localPosition += Vector3.right * 15 * scaleLevelSlider.value;
+        }
+
+        [PublicAPI]
+        public void _MoveMapRight()
+        {
+            distanceMeasureTool._FullyReset();
+            transform.localPosition += Vector3.left * 15 * scaleLevelSlider.value;
+        }
+
+        [PublicAPI]
         public void _UpdateScaleLevel()
         {
             transform.localScale = Vector3.one * scaleLevelSlider.value;

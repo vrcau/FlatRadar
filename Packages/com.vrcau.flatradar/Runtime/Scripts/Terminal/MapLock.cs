@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using UdonSharp;
 using UnityEngine.UI;
+using VRC.SDKBase;
 
 namespace FlatRadar.Terminal
 {
@@ -12,7 +13,9 @@ namespace FlatRadar.Terminal
 
         private void Start()
         {
-            lockToggle.isOn = false;
+            lockToggle.isOn = Networking.LocalPlayer.IsUserInVR();
+
+            _UpdateLock();
         }
 
         [PublicAPI]
