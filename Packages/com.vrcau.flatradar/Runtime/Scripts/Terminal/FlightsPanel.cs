@@ -167,6 +167,8 @@ namespace FlatRadar
                 var groundVelocity = Vector3.ProjectOnPlane(position - _previousPositions[index], Vector3.up);
                 var groundSpeed = groundVelocity.magnitude / (time - _previousTimes[index]) * 1.94384f;
 
+                var verticalSpeed = (position - _previousPositions[index]).y * 60f * 3.28084f;
+
                 _previousPositions[index] = position;
                 _previousTimes[index] = time;
 
@@ -187,7 +189,7 @@ namespace FlatRadar
                 flightTag.transform.localRotation = Quaternion.Inverse(rotation);
 
                 flightTag.text = $"{callSign} {tailNumber}\n" +
-                                 $"{(int)altitude}ft {(int)groundSpeed}kt\n" +
+                                 $"{(int)altitude}ft {(int)groundSpeed}kt {(int)verticalSpeed}fpm\n" +
                                  $"{owner}";
 
                 // Update Flights Text
